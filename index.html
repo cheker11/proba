@@ -4,13 +4,8 @@
     <meta charset="UTF-8">
     <title>EcoAnalyzer AI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Scanner -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f0f4f0; }
@@ -18,75 +13,43 @@
     </style>
 </head>
 
-<body class="min-h-screen flex flex-col items-center p-4 md:p-10">
+<body class="min-h-screen flex flex-col items-center p-4">
 
 <div class="max-w-2xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
-
     <div class="leaf-gradient p-8 text-white text-center">
         <h1 class="text-3xl font-bold mb-2">🌿 EcoAnalyzer AI</h1>
-        <p class="opacity-90">
-            Проверка экологичности по названию, QR или штрих-коду
-        </p>
+        <p class="opacity-90 text-sm">Умный поиск по штрих-коду и названию</p>
     </div>
 
     <div class="p-8">
-
-        <!-- Tabs -->
         <div class="flex gap-2 mb-6">
-            <button id="tabManual" onclick="showManual()"
-                class="flex-1 py-3 rounded-xl bg-green-600 text-white font-semibold">
-                ✍️ Ввод
-            </button>
-            <button id="tabScanner" onclick="showScanner()"
-                class="flex-1 py-3 rounded-xl bg-gray-200 text-gray-700 font-semibold">
-                📷 Сканер
-            </button>
+            <button id="tabManual" onclick="showManual()" class="flex-1 py-3 rounded-xl bg-green-600 text-white font-semibold shadow-md">✍️ Ввод</button>
+            <button id="tabScanner" onclick="showScanner()" class="flex-1 py-3 rounded-xl bg-gray-100 text-gray-600 font-semibold">📷 Сканер</button>
         </div>
 
-        <!-- Manual input -->
         <div id="manualBlock">
-            <input id="productInput"
-                placeholder="Например: Шоколад Roshen"
-                class="w-full p-4 border-2 rounded-xl mb-4 focus:border-green-500 outline-none">
-
-            <button onclick="analyzeProduct()"
-                class="w-full leaf-gradient text-white py-4 rounded-xl font-bold shadow-lg">
-                Проверить продукт
-            </button>
+            <input id="productInput" placeholder="Название или цифры штрих-кода" class="w-full p-4 border-2 border-gray-100 rounded-xl mb-4 focus:border-green-500 outline-none transition-all">
+            <button onclick="analyzeProduct()" class="w-full leaf-gradient text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">Анализировать</button>
         </div>
 
-        <!-- Scanner -->
         <div id="scannerBlock" class="hidden">
-            <div id="reader"
-                class="w-full rounded-xl overflow-hidden border-2 border-dashed border-gray-300"></div>
-            <p class="text-sm text-gray-500 text-center mt-3">
-                Наведите камеру на QR или штрих-код
-            </p>
+            <div id="reader" class="w-full rounded-2xl overflow-hidden border-2 border-green-100"></div>
+            <p class="text-xs text-gray-400 text-center mt-3">Наведите камеру на штрих-код или QR</p>
         </div>
 
-        <!-- Loader -->
         <div id="loader" class="hidden mt-6 text-center">
             <div class="animate-spin inline-block w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full"></div>
-            <p id="loaderText" class="text-gray-500 mt-2">Ищем информацию…</p>
+            <p id="loaderText" class="text-gray-500 mt-2 font-medium">Связываемся с ИИ...</p>
         </div>
 
-        <!-- Result -->
-        <div id="result"
-            class="hidden mt-6 p-6 bg-gray-50 rounded-2xl border border-green-100">
-            <h3 class="text-xl font-semibold mb-3 text-green-800">
-                Результат анализа
-            </h3>
-            <div id="aiResponse" class="text-gray-700 leading-relaxed"></div>
+        <div id="result" class="hidden mt-6 p-6 bg-green-50 rounded-2xl border border-green-100 animate-pulse-once">
+            <div id="aiResponse" class="text-gray-800 leading-relaxed text-sm"></div>
         </div>
-
     </div>
 </div>
 
-<footer class="mt-8 text-gray-400 text-sm">
-    Powered by OpenRouter AI • 2026
-</footer>
-
 <script>
+    // Пожалуйста, используй свой ключ аккуратно. 
     const apiKey = "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";
     let html5Qr;
 
@@ -94,140 +57,84 @@
         stopScanner();
         document.getElementById("manualBlock").classList.remove("hidden");
         document.getElementById("scannerBlock").classList.add("hidden");
-        document.getElementById("tabManual").className =
-            "flex-1 py-3 rounded-xl bg-green-600 text-white font-semibold";
-        document.getElementById("tabScanner").className =
-            "flex-1 py-3 rounded-xl bg-gray-200 text-gray-700 font-semibold";
+        document.getElementById("tabManual").classList.replace("bg-gray-100", "bg-green-600");
+        document.getElementById("tabManual").classList.replace("text-gray-600", "text-white");
+        document.getElementById("tabScanner").classList.replace("bg-green-600", "bg-gray-100");
+        document.getElementById("tabScanner").classList.replace("text-white", "text-gray-600");
     }
 
     function showScanner() {
         document.getElementById("scannerBlock").classList.remove("hidden");
         document.getElementById("manualBlock").classList.add("hidden");
-        document.getElementById("tabScanner").className =
-            "flex-1 py-3 rounded-xl bg-green-600 text-white font-semibold";
-        document.getElementById("tabManual").className =
-            "flex-1 py-3 rounded-xl bg-gray-200 text-gray-700 font-semibold";
+        document.getElementById("tabScanner").classList.replace("bg-gray-100", "bg-green-600");
+        document.getElementById("tabScanner").classList.replace("text-gray-600", "text-white");
+        document.getElementById("tabManual").classList.replace("bg-green-600", "bg-gray-100");
+        document.getElementById("tabManual").classList.replace("text-white", "text-gray-600");
         startScanner();
     }
 
-    async function getProductNameByBarcode(barcode) {
-        try {
-            const res = await fetch(
-                `https://world.openfoodfacts.org/api/v2/product/${barcode}.json`
-            );
-            const data = await res.json();
-            if (data.status === 1) {
-                return data.product.product_name ||
-                       data.product.generic_name ||
-                       null;
-            }
-            return null;
-        } catch {
-            return null;
-        }
-    }
-
-    async function guessProductByBarcode(barcode) {
-        try {
-            const response = await fetch(
-                "https://openrouter.ai/api/v1/chat/completions",
-                {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${apiKey}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        model: "arcee-ai/trinity-mini:free",
-                        messages: [
-                            {
-                                role: "system",
-                                content:
-                                  "Ты эксперт по товарам. По штрих-коду определи вероятный тип товара, бренд и категорию. Дай краткое название."
-                            },
-                            {
-                                role: "user",
-                                content: `Штрих-код: ${barcode}`
-                            }
-                        ]
-                    })
-                }
-            );
-
-            const data = await response.json();
-            return data.choices[0].message.content.trim();
-        } catch {
-            return "Неизвестный потребительский товар";
-        }
-    }
-
-    async function analyzeProduct(manualName = null) {
-        let product =
-            manualName || document.getElementById("productInput").value;
-
-        if (!product) return alert("Введите название или отсканируйте код");
+    async function analyzeProduct(manualData = null) {
+        let input = manualData || document.getElementById("productInput").value.trim();
+        if (!input) return alert("Введите данные");
 
         const loader = document.getElementById("loader");
         const result = document.getElementById("result");
         const aiResponse = document.getElementById("aiResponse");
+        const loaderText = document.getElementById("loaderText");
 
         loader.classList.remove("hidden");
         result.classList.add("hidden");
 
-        let finalName = product;
+        let isBarcode = /^\d+$/.test(input);
+        let productName = input;
 
-        if (/^\d+$/.test(product.trim())) {
-            document.getElementById("loaderText").innerText =
-                "Ищем товар по штрих-коду…";
-
-            const nameFromDb = await getProductNameByBarcode(product.trim());
-
-            if (nameFromDb) {
-                finalName = nameFromDb;
-            } else {
-                document.getElementById("loaderText").innerText =
-                    "Определяем товар с помощью ИИ…";
-                finalName = await guessProductByBarcode(product.trim());
-            }
+        // ШАГ 1: Если это штрих-код, пытаемся быстро дернуть базу OpenFoodFacts
+        if (isBarcode) {
+            loaderText.innerText = "Поиск в базе данных...";
+            try {
+                const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${input}.json`);
+                const data = await res.json();
+                if (data.status === 1) {
+                    productName = data.product.product_name || data.product.generic_name || input;
+                }
+            } catch (e) { console.error("DB Error"); }
         }
 
-        document.getElementById("loaderText").innerText =
-            "ИИ анализирует экологичность…";
+        loaderText.innerText = "ИИ анализирует продукт...";
 
+        // ШАГ 2: Отправляем всё в Gemini 2.0
         try {
-            const response = await fetch(
-                "https://openrouter.ai/api/v1/chat/completions",
-                {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${apiKey}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        model: "arcee-ai/trinity-mini:free",
-                        messages: [
-                            {
-                                role: "system",
-                                content:
-                                  "Ты эко-консультант. Оцени продукт по 3 критериям: Состав/Материалы, Упаковка, Переработка. В конце Eco-Score: X/100. Кратко, по пунктам, с эмодзи."
-                            },
-                            {
-                                role: "user",
-                                content: `Проанализируй продукт: ${finalName}`
-                            }
-                        ]
-                    })
-                }
-            );
+            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": window.location.href 
+                },
+                body: JSON.stringify({
+                    model: "google/gemini-2.0-flash-exp:free",
+                    messages: [
+                        {
+                            role: "system",
+                            content: "Ты — эксперт по товарам и экологии. Если пользователь прислал цифры штрих-кода, найди в своей базе данных, что это за товар. Оцени его: 1. Состав 2. Упаковка 3. Переработка. Поставь Eco-Score: X/100. Пиши кратко, на русском, используй эмодзи."
+                        },
+                        {
+                            role: "user",
+                            content: isBarcode ? `Штрих-код: ${input}` : `Товар: ${input}`
+                        }
+                    ]
+                })
+            });
 
             const data = await response.json();
-            aiResponse.innerHTML =
-                `<strong>Продукт:</strong> ${finalName}<br><br>` +
-                data.choices[0].message.content.replace(/\n/g, "<br>");
+            const aiText = data.choices[0].message.content;
 
+            aiResponse.innerHTML = `<div class="font-bold text-green-700 mb-2">Объект: ${productName}</div>` + 
+                                   aiText.replace(/\n/g, "<br>");
             result.classList.remove("hidden");
-        } catch {
-            alert("Ошибка анализа");
+
+        } catch (e) {
+            alert("Ошибка сети или лимитов ИИ");
         } finally {
             loader.classList.add("hidden");
         }
@@ -235,40 +142,29 @@
 
     function startScanner() {
         html5Qr = new Html5Qrcode("reader");
-
-        const config = {
-            fps: 10,
-            qrbox: { width: 260, height: 180 },
-            formatsToSupport: [
-                Html5QrcodeSupportedFormats.QR_CODE,
-                Html5QrcodeSupportedFormats.EAN_13,
-                Html5QrcodeSupportedFormats.EAN_8,
-                Html5QrcodeSupportedFormats.UPC_A,
-                Html5QrcodeSupportedFormats.UPC_E,
-                Html5QrcodeSupportedFormats.CODE_128
-            ]
+        const config = { 
+            fps: 15, 
+            qrbox: { width: 250, height: 150 },
+            aspectRatio: 1.77
         };
-
+        
         html5Qr.start(
             { facingMode: "environment" },
             config,
-            (decodedText) => {
+            (text) => {
                 if (navigator.vibrate) navigator.vibrate(100);
                 stopScanner();
-                analyzeProduct(decodedText);
-            },
-            () => {}
-        );
+                analyzeProduct(text);
+            }
+        ).catch(() => alert("Камера недоступна"));
     }
 
     function stopScanner() {
         if (html5Qr && html5Qr.isScanning) {
-            html5Qr.stop().then(() => html5Qr.clear()).catch(() => {});
+            html5Qr.stop().then(() => html5Qr.clear());
         }
     }
 </script>
 
 </body>
 </html>
-
-
